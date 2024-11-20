@@ -1,0 +1,78 @@
+#define LED_PIN 13  // Pin to which LED or relay is connected
+
+// Define Morse code timing
+const int dotDuration = 200;  // Duration of a dot (in milliseconds)
+const int dashDuration = 600; // Duration of a dash (3 times dot)
+const int symbolGap = 200;    // Gap between symbols in the same letter
+const int letterGap = 600;    // Gap between letters
+const int wordGap = 1400;     // Gap between words
+
+// Morse code dictionary
+String morseCode[] = {
+  ".-", "-...", "-.-.", "-..", ".", "..-.", "--.", "....", "..",  // A-I
+  ".---", "-.-", ".-..", "--", "-.", "---", ".--.", "--.-", ".-.",  // J-R
+  "...", "-", "..-", "...-", ".--", "-..-", "-.--", "--..",  // S-Z
+  "-----", ".----", "..---", "...--", "....-", ".....", "-....", "--...", "---..", "----."  // 0-9
+};
+
+// Function to blink LED for a dot
+void dot() {
+  digitalWrite(LED_PIN, HIGH);
+  delay(dotDuration);
+  digitalWrite(LED_PIN, LOW);
+  delay(symbolGap);
+}
+
+// Function to blink LED for a dash
+void dash() {
+  digitalWrite(LED_PIN, HIGH);
+  delay(dashDuration);
+  digitalWrite(LED_PIN, LOW);
+  delay(symbolGap);
+}
+
+// Function to send a character as Morse code
+void sendMorseChar(char c) {
+  if (c == ' ') {
+    delay(wordGap); // Gap for spaces
+    return;
+  }
+  
+  int index;
+  if (c >= 'A' && c <= 'Z') {
+    index = c - 'A'; // Index for uppercase letters
+  } else if (c >= 'a' && c <= 'z') {
+    index = c - 'a'; // Index for lowercase letters
+  } else if (c >= '0' && c <= '9') {
+    index = c - '0' + 26; // Index for numbers
+  } else {
+    return; // Ignore unsupported characters
+  }
+  
+  String code = morseCode[index];
+  for (int i = 0; i < code.length(); i++) {
+    if (code[i] == '.') {
+      dot();
+    } else if (code[i] == '-') {
+      dash();
+    }
+  }
+  delay(letterGap); // Gap between letters
+}
+
+// Function to send a Morse code message
+void sendMessage(String message) {
+  for (int i = 0; i < message.length(); i++) {
+    sendMorseChar(message[i]);
+  }
+}
+
+void setup() {
+  pinMode(LED_PIN, OUTPUT);
+}
+
+void loop() {
+  String message = "HELLO WORLD"; // Change this to your desired message
+  sendMessage(message);
+  delay(5000); // Wait for 5 seconds before repeating the message
+}
